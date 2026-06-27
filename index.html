@@ -1159,7 +1159,7 @@
         </div>
         <div class="fact" style="border-bottom:0;padding:13px 0 0">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <span>ข้อมูล ณ วันที่</span>
+          <span>ข้อมูล ณ เดือน</span>
           <b id="detailDate"></b>
         </div>
       </aside>
@@ -1314,10 +1314,10 @@
 
     const reservoirCodes = ["DK", "NPL", "KY", "PS"];
 
-    function thaiDateFromYearIndex(year, dayIndex) {
-      const date = new Date(Date.UTC(year, 0, 1 + dayIndex));
+    function thaiMonthFromYearIndex(yearKey, monthIndex) {
+      const buddhistYear = 2500 + Number(yearKey.slice(1));
       const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-      return `${date.getUTCDate()} ${months[date.getUTCMonth()]} ${date.getUTCFullYear() + 543}`;
+      return `${months[monthIndex]} ${buddhistYear}`;
     }
 
     function latestCompleteSnapshot(levelEnd) {
@@ -1328,9 +1328,8 @@
 
       for (let yi = years.length - 1; yi >= 0; yi -= 1) {
         const yearKey = years[yi];
-        const year = Number(yearKey.slice(1));
         const arrays = reservoirCodes.map(code => levelEnd[code] && levelEnd[code][yearKey]);
-        if (!Number.isFinite(year) || arrays.some(arr => !Array.isArray(arr))) continue;
+        if (!Number.isFinite(Number(yearKey.slice(1))) || arrays.some(arr => !Array.isArray(arr))) continue;
 
         const maxLength = Math.max(...arrays.map(arr => arr.length));
         for (let i = maxLength - 1; i >= 0; i -= 1) {
@@ -1338,7 +1337,7 @@
           if (reservoirCodes.every(code => Number.isFinite(values[code]))) {
             return {
               values,
-              date: thaiDateFromYearIndex(year, i)
+              date: thaiMonthFromYearIndex(yearKey, i)
             };
           }
         }
