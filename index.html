@@ -1159,7 +1159,7 @@
         </div>
         <div class="fact" style="border-bottom:0;padding:13px 0 0">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <span>ข้อมูล ณ เดือน</span>
+          <span>ข้อมูล ณ วันที่</span>
           <b id="detailDate"></b>
         </div>
       </aside>
@@ -1314,10 +1314,13 @@
 
     const reservoirCodes = ["DK", "NPL", "KY", "PS"];
 
-    function thaiMonthFromYearIndex(yearKey, monthIndex) {
-      const buddhistYear = 2500 + Number(yearKey.slice(1));
+    function thaiGeneratedDate(value) {
+      if (!value) return "";
+      const [datePart, timePart = ""] = value.split(" ");
+      const [year, month, day] = datePart.split("-").map(Number);
       const months = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-      return `${months[monthIndex]} ${buddhistYear}`;
+      if (!year || !month || !day) return value;
+      return `${day} ${months[month - 1]} ${year + 543}${timePart ? ` ${timePart} น.` : ""}`;
     }
 
     function latestCompleteSnapshot(levelEnd) {
@@ -1336,8 +1339,7 @@
           const values = Object.fromEntries(reservoirCodes.map((code, index) => [code, arrays[index][i]]));
           if (reservoirCodes.every(code => Number.isFinite(values[code]))) {
             return {
-              values,
-              date: thaiMonthFromYearIndex(yearKey, i)
+              values
             };
           }
         }
@@ -1353,7 +1355,7 @@
         reservoirs[code].current = snapshot.values[code];
       });
       sourceLabel = label;
-      dataDate = snapshot.date;
+      dataDate = thaiGeneratedDate(data.generated) || dataDate;
       document.getElementById("footerDate").textContent = dataDate;
       if (pinnedCode || previewCode) renderReservoir(pinnedCode || previewCode);
       return true;
