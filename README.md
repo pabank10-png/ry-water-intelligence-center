@@ -24,4 +24,5 @@ Map tiles and labels are provided by Esri, OpenStreetMap contributors, and CARTO
 - iPhone/mobile uses the real Leaflet map markers in a dedicated reservoir selection area before the dashboard cards.
 - The mobile map is locked in place and fitted so DK, NPL, KY, and PS remain visible in portrait and landscape.
 - Mobile map attribution is shown in the reservoir selection area for readability.
+- The mobile background map stays fixed while scrolling, while reservoir markers remain tappable and open the existing detail panel.
 - iPad and desktop keep the standard desktop layout.
