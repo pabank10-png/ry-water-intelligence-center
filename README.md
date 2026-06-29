@@ -18,3 +18,10 @@ https://raw.githubusercontent.com/pabank10-png/water-dashboard/main/data.json
 ## Map Credits
 
 Map tiles and labels are provided by Esri, OpenStreetMap contributors, and CARTO. Attribution is shown on the page.
+
+## Final Mobile Behavior
+
+- iPhone/mobile uses the real Leaflet map markers in a dedicated reservoir selection area before the dashboard cards.
+- The mobile map is locked in place and fitted so DK, NPL, KY, and PS remain visible in portrait and landscape.
+- Mobile map attribution is shown in the reservoir selection area for readability.
+- iPad and desktop keep the standard desktop layout.

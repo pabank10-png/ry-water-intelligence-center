@@ -197,6 +197,14 @@
 
     .real-map .leaflet-control-attribution a { color: rgba(189, 231, 255, .86); }
 
+    html.is-iphone .real-map .leaflet-control-attribution {
+      display: none;
+    }
+
+    .mobile-reservoir-map {
+      display: none;
+    }
+
     .reservoir-div-icon {
       background: transparent;
       border: 0;
@@ -1118,6 +1126,67 @@
       min-height: 0;
     }
 
+    html.is-iphone .mobile-reservoir-map {
+      position: relative;
+      display: block;
+      margin: 1px 0 2px;
+      min-height: 145px;
+      padding: 11px 12px 12px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    html.is-iphone .mobile-reservoir-map::before {
+      content: none;
+    }
+
+    html.is-iphone .mobile-reservoir-title {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: rgba(228, 243, 255, .92);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, .58);
+    }
+
+    html.is-iphone .mobile-reservoir-title span {
+      color: rgba(179, 208, 226, .8);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    html.is-iphone .mobile-map-ref {
+      position: absolute;
+      right: 12px;
+      bottom: 4px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      max-width: calc(100% - 24px);
+      padding: 2px 6px;
+      border-radius: 8px;
+      background: rgba(5, 18, 34, .72);
+      border: 1px solid rgba(162, 214, 255, .14);
+      color: rgba(220, 236, 248, .74);
+      font-size: 10px;
+      line-height: 1.35;
+      white-space: nowrap;
+      text-shadow: none;
+    }
+
+    html.is-iphone .mobile-map-ref a {
+      color: rgba(189, 231, 255, .86);
+    }
+
     html.is-iphone .detail:not(.is-visible) {
       display: none;
     }
@@ -1154,7 +1223,7 @@
     }
 
     html.is-iphone .dashboards {
-      padding-top: 3px;
+      padding-top: 1px;
     }
 
     html.is-iphone .dashboards h2 {
@@ -1251,6 +1320,22 @@
         grid-column: 2;
         grid-row: 2;
         align-self: start;
+        padding-top: 128px;
+        pointer-events: none;
+      }
+
+      html.is-iphone .dashboards .cards,
+      html.is-iphone .dashboards .card {
+        pointer-events: auto;
+      }
+
+      html.is-iphone .mobile-reservoir-map {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: start;
+        min-height: 116px;
+        margin: 0;
+        padding: 9px 10px 10px;
       }
 
       html.is-iphone .cards {
@@ -1418,6 +1503,17 @@
           <b id="detailDate"></b>
         </div>
       </aside>
+
+      <section class="mobile-reservoir-map" aria-label="เลือกอ่างเก็บน้ำ">
+        <div class="mobile-reservoir-title">
+          <strong>เลือกอ่างเก็บน้ำ</strong>
+          <span>แตะจุดเพื่อดูข้อมูล</span>
+        </div>
+        <div class="mobile-map-ref" aria-label="Map attribution">
+          <a href="https://leafletjs.com/" target="_blank" rel="noreferrer">Leaflet</a>
+          <span>&nbsp;| Tiles © Esri, © OpenStreetMap © CARTO</span>
+        </div>
+      </section>
 
       <section class="dashboards" aria-label="Dashboard links">
         <h2>Dashboards</h2>
@@ -1738,12 +1834,54 @@
         });
       });
 
+      function fitMobileReservoirMap() {
+        if (!IS_IPHONE) return;
+        const strip = document.querySelector(".mobile-reservoir-map");
+        if (!strip) return;
+        const rect = strip.getBoundingClientRect();
+        if (rect.width < 120 || rect.height < 80) return;
+
+        const bounds = L.latLngBounds(Object.values(reservoirCoordinates).map(item => item.latLng));
+        const mapSize = map.getSize();
+        const titleOffset = window.innerWidth > window.innerHeight ? 30 : 34;
+        const targetWidth = Math.max(180, rect.width - 64);
+        const targetHeight = Math.max(70, rect.height - titleOffset - 8);
+        let zoom = 13;
+
+        for (let candidate = 13; candidate >= 7; candidate -= 1) {
+          const nw = map.project(bounds.getNorthWest(), candidate);
+          const se = map.project(bounds.getSouthEast(), candidate);
+          const size = L.point(Math.abs(se.x - nw.x), Math.abs(se.y - nw.y));
+          if (size.x <= targetWidth && size.y <= targetHeight) {
+            zoom = candidate;
+            break;
+          }
+        }
+
+        const targetCenter = L.point(
+          rect.left + rect.width / 2,
+          rect.top + titleOffset + (rect.height - titleOffset) / 2
+        );
+        const viewportCenter = L.point(mapSize.x / 2, mapSize.y / 2);
+        const projectedCenter = map.project(bounds.getCenter(), zoom);
+        const shiftedCenter = map.unproject(projectedCenter.subtract(targetCenter.subtract(viewportCenter)), zoom);
+        map.setView(shiftedCenter, zoom, { animate: false });
+      }
+
       if (IS_IPHONE) {
-        const reservoirBounds = L.latLngBounds(Object.values(reservoirCoordinates).map(item => item.latLng));
-        map.fitBounds(reservoirBounds, {
-          paddingTopLeft: [24, 96],
-          paddingBottomRight: [24, 170],
-          maxZoom: 10
+        map.whenReady(() => {
+          map.invalidateSize();
+          window.requestAnimationFrame(fitMobileReservoirMap);
+        });
+        window.addEventListener("resize", () => {
+          map.invalidateSize();
+          window.requestAnimationFrame(fitMobileReservoirMap);
+        });
+        window.addEventListener("orientationchange", () => {
+          window.setTimeout(() => {
+            map.invalidateSize();
+            fitMobileReservoirMap();
+          }, 180);
         });
       }
 
