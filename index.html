@@ -1066,7 +1066,9 @@
 
     html.is-iphone .real-map {
       position: fixed;
+      inset: 0;
       height: 100svh;
+      min-height: 100svh;
     }
 
     html.is-iphone .app {
@@ -1869,11 +1871,15 @@
       }
 
       if (IS_IPHONE) {
+        let lastMobileOrientation = window.innerWidth > window.innerHeight ? "landscape" : "portrait";
         map.whenReady(() => {
           map.invalidateSize();
           window.requestAnimationFrame(fitMobileReservoirMap);
         });
         window.addEventListener("resize", () => {
+          const currentOrientation = window.innerWidth > window.innerHeight ? "landscape" : "portrait";
+          if (currentOrientation === lastMobileOrientation) return;
+          lastMobileOrientation = currentOrientation;
           map.invalidateSize();
           window.requestAnimationFrame(fitMobileReservoirMap);
         });
