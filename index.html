@@ -211,6 +211,11 @@
     }
 
     .reservoir-marker {
+      --status-main: #28cfff;
+      --status-dark: #0c5ea7;
+      --status-bg: linear-gradient(145deg, rgba(28, 143, 219, .94), rgba(8, 55, 112, .96));
+      --status-glow: rgba(24, 200, 255, .62);
+      --status-ring: rgba(24, 200, 255, .15);
       position: relative;
       display: inline-grid;
       place-items: center;
@@ -218,16 +223,48 @@
       height: 34px;
       border: 1px solid rgba(216, 246, 255, .92);
       border-radius: 50%;
-      background: linear-gradient(145deg, rgba(28, 143, 219, .94), rgba(8, 55, 112, .96));
+      background: var(--status-bg);
       color: white;
       font-weight: 900;
       font-size: 13px;
       letter-spacing: 0;
-      box-shadow: 0 0 0 3px rgba(24, 200, 255, .15), 0 0 20px rgba(24, 200, 255, .62);
+      box-shadow: 0 0 0 3px var(--status-ring), 0 0 20px var(--status-glow);
       transform: translate(-50%, -50%);
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
       cursor: pointer;
       user-select: none;
+    }
+
+    .reservoir-marker.status-critical {
+      --status-main: #ff4d5a;
+      --status-dark: #8c1722;
+      --status-bg: linear-gradient(145deg, rgba(255, 94, 105, .96), rgba(140, 23, 34, .98));
+      --status-glow: rgba(255, 77, 90, .68);
+      --status-ring: rgba(255, 77, 90, .18);
+    }
+
+    .reservoir-marker.status-warning {
+      --status-main: #ffd247;
+      --status-dark: #9b6b00;
+      --status-bg: linear-gradient(145deg, rgba(255, 220, 86, .96), rgba(155, 107, 0, .98));
+      --status-glow: rgba(255, 210, 71, .64);
+      --status-ring: rgba(255, 210, 71, .18);
+    }
+
+    .reservoir-marker.status-normal {
+      --status-main: #2bd97f;
+      --status-dark: #0f6f43;
+      --status-bg: linear-gradient(145deg, rgba(55, 226, 136, .96), rgba(15, 111, 67, .98));
+      --status-glow: rgba(43, 217, 127, .62);
+      --status-ring: rgba(43, 217, 127, .16);
+    }
+
+    .reservoir-marker.status-unknown {
+      --status-main: #9fb4c5;
+      --status-dark: #526678;
+      --status-bg: linear-gradient(145deg, rgba(159, 180, 197, .94), rgba(82, 102, 120, .96));
+      --status-glow: rgba(159, 180, 197, .42);
+      --status-ring: rgba(159, 180, 197, .14);
     }
 
     .reservoir-marker::after {
@@ -239,18 +276,34 @@
       height: 6px;
       transform: translate(-50%, 4px);
       border-radius: 50%;
-      background: #31d8ff;
-      box-shadow: 0 0 14px rgba(24, 200, 255, .86), 0 0 0 4px rgba(24, 200, 255, .1);
+      background: var(--status-main);
+      box-shadow: 0 0 14px var(--status-glow), 0 0 0 4px var(--status-ring);
     }
 
     .reservoir-halo {
       filter: drop-shadow(0 0 8px rgba(24, 200, 255, .45));
     }
 
+    .reservoir-halo.status-critical {
+      filter: drop-shadow(0 0 8px rgba(255, 77, 90, .5));
+    }
+
+    .reservoir-halo.status-warning {
+      filter: drop-shadow(0 0 8px rgba(255, 210, 71, .48));
+    }
+
+    .reservoir-halo.status-normal {
+      filter: drop-shadow(0 0 8px rgba(43, 217, 127, .46));
+    }
+
+    .reservoir-halo.status-unknown {
+      filter: drop-shadow(0 0 8px rgba(159, 180, 197, .3));
+    }
+
     .reservoir-marker:hover,
     .reservoir-marker.active {
       transform: translate(-50%, calc(-50% - 4px)) scale(1.08);
-      box-shadow: 0 0 0 5px rgba(24, 200, 255, .2), 0 0 30px rgba(24, 200, 255, .86);
+      box-shadow: 0 0 0 5px var(--status-ring), 0 0 30px var(--status-glow);
       filter: saturate(1.18);
     }
 
@@ -789,6 +842,26 @@
       transition: width 850ms cubic-bezier(.2, .8, .2, 1);
     }
 
+    .water-now.status-critical .bar span {
+      background: linear-gradient(90deg, #ff4d5a, #ff9aa3);
+      box-shadow: 0 0 18px rgba(255, 77, 90, .58);
+    }
+
+    .water-now.status-warning .bar span {
+      background: linear-gradient(90deg, #ffd247, #ffe99b);
+      box-shadow: 0 0 18px rgba(255, 210, 71, .5);
+    }
+
+    .water-now.status-normal .bar span {
+      background: linear-gradient(90deg, #20c978, #7df0ae);
+      box-shadow: 0 0 18px rgba(43, 217, 127, .52);
+    }
+
+    .water-now.status-unknown .bar span {
+      background: linear-gradient(90deg, #8fa5b8, #c5d6e3);
+      box-shadow: 0 0 18px rgba(159, 180, 197, .35);
+    }
+
     .percent-row {
       display: flex;
       justify-content: space-between;
@@ -1132,7 +1205,7 @@
       position: relative;
       display: block;
       margin: 1px 0 2px;
-      min-height: 145px;
+      min-height: 185px;
       padding: 11px 12px 12px;
       border: 0;
       border-radius: 0;
@@ -1322,7 +1395,7 @@
         grid-column: 2;
         grid-row: 2;
         align-self: start;
-        padding-top: 128px;
+        padding-top: 152px;
         pointer-events: none;
       }
 
@@ -1335,7 +1408,7 @@
         grid-column: 2;
         grid-row: 2;
         align-self: start;
-        min-height: 116px;
+        min-height: 140px;
         margin: 0;
         padding: 9px 10px 10px;
       }
@@ -1566,7 +1639,7 @@
     document.documentElement.classList.toggle("is-iphone", IS_IPHONE);
     const LOCK_MAP = false;
     const DEFAULT_MAP_VIEW = {
-      center: [12.805106, 101.249313],
+      center: [12.9346, 101.377],
       zoom: 10
     };
 
@@ -1602,6 +1675,38 @@
         built: "เริ่มต้นก่อสร้างขึ้นเมื่อปี พ.ศ. 2543",
         address: "อ.วังจันทร์ / อ.แกลง จ.ระยอง",
         image: "url('assets/reservoir-photos/PS.jpg')"
+      },
+      BP: {
+        name: "เขื่อนบางพระ",
+        capacity: null,
+        current: null,
+        built: "เริ่มต้นก่อสร้างโดยกรมชลประทานในปี พ.ศ. 2515",
+        address: "อ.ศรีราชา จ.ชลบุรี",
+        image: "url('assets/reservoir-photos/BP.jpg')"
+      },
+      NK: {
+        name: "อ่างเก็บน้ำหนองค้อ",
+        capacity: null,
+        current: null,
+        built: "เริ่มต้นก่อสร้างโดยกรมชลประทานในปี พ.ศ. 2523",
+        address: "ตำบลหนองขาม อำเภอศรีราชา จังหวัดชลบุรี",
+        image: "url('assets/reservoir-photos/NK.jpg')"
+      },
+      PK: {
+        name: "อ่างเก็บน้ำคลองประแกด",
+        capacity: null,
+        current: null,
+        built: "สร้างแล้วเสร็จโดยกรมชลประทานในปี พ.ศ. 2558-2560",
+        address: "ตำบลพวา อ.แก่งหางแมว จ.จันทบุรี",
+        image: "url('assets/reservoir-photos/PK.jpg')"
+      },
+      HM: {
+        name: "อ่างเก็บน้ำคลองหางแมว",
+        capacity: null,
+        current: null,
+        built: "ก่อสร้างโดยกรมชลประทานในปี พ.ศ. 2560-2565",
+        address: "ตำบลขุนซ่อง อำเภอแก่งหางแมว จังหวัดจันทบุรี",
+        image: "url('assets/reservoir-photos/HM.jpg')"
       }
     };
 
@@ -1610,9 +1715,91 @@
     let dataDate = "24 พ.ค. 2568";
     let pinnedCode = null;
     let previewCode = null;
+    const reservoirMapLayers = {};
+
+    const reservoirStatusConfig = {
+      critical: {
+        label: "วิกฤต",
+        markerClass: "status-critical",
+        color: "#ff4d5a",
+        fillColor: "#ff4d5a",
+        opacity: .86,
+        fillOpacity: .13
+      },
+      warning: {
+        label: "เฝ้าระวัง",
+        markerClass: "status-warning",
+        color: "#ffd247",
+        fillColor: "#ffd247",
+        opacity: .82,
+        fillOpacity: .12
+      },
+      normal: {
+        label: "น้ำปกติ",
+        markerClass: "status-normal",
+        color: "#2bd97f",
+        fillColor: "#2bd97f",
+        opacity: .78,
+        fillOpacity: .1
+      },
+      unknown: {
+        label: "รอข้อมูล",
+        markerClass: "status-unknown",
+        color: "#9fb4c5",
+        fillColor: "#9fb4c5",
+        opacity: .5,
+        fillOpacity: .06
+      }
+    };
 
     function fmt(value) {
       return value.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtDataValue(value) {
+      return Number.isFinite(value) ? `${fmt(value)} ล้าน ลบ.ม.` : "รอข้อมูลจาก API";
+    }
+
+    function reservoirPercent(code) {
+      const item = reservoirs[code];
+      if (!item || !Number.isFinite(item.current) || !Number.isFinite(item.capacity) || item.capacity <= 0) return null;
+      return Math.min(100, (item.current / item.capacity) * 100);
+    }
+
+    function reservoirStatus(code) {
+      const percent = reservoirPercent(code);
+      if (!Number.isFinite(percent)) return { key: "unknown", percent: null, ...reservoirStatusConfig.unknown };
+      if (percent < 30) return { key: "critical", percent, ...reservoirStatusConfig.critical };
+      if (percent <= 50) return { key: "warning", percent, ...reservoirStatusConfig.warning };
+      return { key: "normal", percent, ...reservoirStatusConfig.normal };
+    }
+
+    function applyReservoirMarkerStatuses() {
+      Object.keys(reservoirs).forEach(code => {
+        const status = reservoirStatus(code);
+        const item = reservoirs[code];
+        document.querySelectorAll(`.reservoir-marker[data-reservoir="${code}"]`).forEach(marker => {
+          marker.classList.remove("status-critical", "status-warning", "status-normal", "status-unknown");
+          marker.classList.add(status.markerClass);
+          const percentText = Number.isFinite(status.percent) ? `${status.percent.toFixed(2)}%` : "รอข้อมูล";
+          marker.setAttribute("title", `${item.name}: ${status.label} (${percentText})`);
+          marker.setAttribute("aria-label", `${item.name} ${status.label} ${percentText}`);
+        });
+        const layer = reservoirMapLayers[code];
+        if (layer && layer.halo) {
+          const haloElement = layer.halo.getElement && layer.halo.getElement();
+          if (haloElement) {
+            haloElement.classList.remove("status-critical", "status-warning", "status-normal", "status-unknown");
+            haloElement.classList.add(status.markerClass);
+          }
+          layer.halo.setStyle({
+            color: status.color,
+            fillColor: status.fillColor,
+            opacity: status.opacity,
+            fillOpacity: status.fillOpacity
+          });
+        }
+      });
     }
 
     function highlightReservoir(code) {
@@ -1638,7 +1825,8 @@
 
     function renderReservoir(code, options = {}) {
       const item = reservoirs[code];
-      const percent = Math.min(100, (item.current / item.capacity) * 100);
+      const status = reservoirStatus(code);
+      const percent = Number.isFinite(status.percent) ? status.percent : 0;
       const detail = document.getElementById("detail");
       if (options.pin) {
         pinnedCode = code;
@@ -1652,13 +1840,16 @@
         document.getElementById("detailName").textContent = item.name;
         document.getElementById("detailBuilt").textContent = item.built;
         document.getElementById("detailAddress").textContent = item.address;
-        document.getElementById("detailCapacity").textContent = `${fmt(item.capacity)} ล้าน ลบ.ม.`;
-        document.getElementById("detailCurrent").textContent = `${fmt(item.current)} ล้าน ลบ.ม.`;
-        document.getElementById("detailPercent").textContent = `${percent.toFixed(2)}%`;
+        document.getElementById("detailCapacity").textContent = fmtDataValue(item.capacity);
+        document.getElementById("detailCurrent").textContent = fmtDataValue(item.current);
+        document.getElementById("detailPercent").textContent = Number.isFinite(status.percent) ? `${status.percent.toFixed(2)}% (${status.label})` : `รอข้อมูล (${status.label})`;
         document.getElementById("detailDate").textContent = dataDate;
         document.getElementById("sourceTag").textContent = sourceLabel === "ข้อมูลจริง" ? "(ข้อมูลจริง)" : sourceLabel === "ข้อมูล cache" ? "(ข้อมูลล่าสุดที่บันทึกไว้)" : "(ข้อมูลตั้งต้น)";
         document.getElementById("detailImage").style.backgroundImage = item.image;
         highlightReservoir(code);
+        const waterNow = detail.querySelector(".water-now");
+        waterNow.classList.remove("status-critical", "status-warning", "status-normal", "status-unknown");
+        waterNow.classList.add(status.markerClass);
         document.getElementById("detailBar").style.width = "0%";
         window.requestAnimationFrame(() => {
           document.getElementById("detailBar").style.width = `${percent}%`;
@@ -1667,7 +1858,28 @@
       }, 150);
     }
 
-    const reservoirCodes = ["DK", "NPL", "KY", "PS"];
+    const reservoirApiSources = [
+      {
+        url: "https://app.rid.go.th/reservoir/api/reservoir/public/",
+        label: "reservoir",
+        codes: {
+          DK: "อ่างเก็บน้ำดอกกราย",
+          KY: "อ่างเก็บน้ำคลองใหญ่",
+          NK: "อ่างเก็บน้ำหนองค้อ",
+          PK: "อ่างเก็บน้ำคลองประแกด",
+          HM: "อ่างเก็บน้ำ คลองหางแมว"
+        }
+      },
+      {
+        url: "https://app.rid.go.th/reservoir/api/dam/public/",
+        label: "dam",
+        codes: {
+          BP: "เขื่อนบางพระ",
+          NPL: "เขื่อนหนองปลาไหล",
+          PS: "เขื่อนประแสร์"
+        }
+      }
+    ];
 
     function thaiGeneratedDate(value) {
       if (!value) return "";
@@ -1678,40 +1890,43 @@
       return `${day} ${months[month - 1]} ${year + 543}${timePart ? ` ${timePart} น.` : ""}`;
     }
 
-    function latestCompleteSnapshot(levelEnd) {
-      if (!levelEnd) return null;
-      const years = Array.from(new Set(
-        reservoirCodes.flatMap(code => Object.keys(levelEnd[code] || {}))
-      )).sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
-
-      for (let yi = years.length - 1; yi >= 0; yi -= 1) {
-        const yearKey = years[yi];
-        const arrays = reservoirCodes.map(code => levelEnd[code] && levelEnd[code][yearKey]);
-        if (!Number.isFinite(Number(yearKey.slice(1))) || arrays.some(arr => !Array.isArray(arr))) continue;
-
-        const maxLength = Math.max(...arrays.map(arr => arr.length));
-        for (let i = maxLength - 1; i >= 0; i -= 1) {
-          const values = Object.fromEntries(reservoirCodes.map((code, index) => [code, arrays[index][i]]));
-          if (reservoirCodes.every(code => Number.isFinite(values[code]))) {
-            return {
-              values
-            };
-          }
+    function collectRidReservoirRows(data) {
+      const rows = [];
+      const walk = value => {
+        if (Array.isArray(value)) {
+          value.forEach(walk);
+          return;
         }
-      }
-
-      return null;
+        if (!value || typeof value !== "object") return;
+        if (typeof value.name === "string" && Number.isFinite(Number(value.storage)) && Number.isFinite(Number(value.volume))) {
+          rows.push(value);
+        }
+        Object.values(value).forEach(walk);
+      };
+      walk(data);
+      return rows;
     }
 
-    function applyLatestReservoirData(data, label) {
-      const snapshot = latestCompleteSnapshot(data.level_end);
-      if (!snapshot) return false;
-      reservoirCodes.forEach(code => {
-        reservoirs[code].current = snapshot.values[code];
+    function applyRidReservoirData(payloads, label) {
+      let updated = false;
+      let latestDate = "";
+      payloads.forEach(({ data, source }) => {
+        if (!data || !source) return;
+        if (data.date && data.date > latestDate) latestDate = data.date;
+        const rows = collectRidReservoirRows(data);
+        Object.entries(source.codes).forEach(([code, apiName]) => {
+          const row = rows.find(item => item.name === apiName);
+          if (!row || !reservoirs[code]) return;
+          reservoirs[code].capacity = Number(row.storage);
+          reservoirs[code].current = Number(row.volume);
+          updated = true;
+        });
       });
+      if (!updated) return false;
       sourceLabel = label;
-      dataDate = thaiGeneratedDate(data.generated) || dataDate;
+      dataDate = thaiGeneratedDate(latestDate) || dataDate;
       document.getElementById("footerDate").textContent = dataDate;
+      applyReservoirMarkerStatuses();
       if (pinnedCode || previewCode) renderReservoir(pinnedCode || previewCode);
       return true;
     }
@@ -1719,7 +1934,7 @@
     function loadCachedLatest() {
       try {
         const cached = JSON.parse(localStorage.getItem(latestDataStorageKey) || "null");
-        return cached && applyLatestReservoirData(cached, "ข้อมูล cache");
+        return cached && applyRidReservoirData(cached, "ข้อมูล cache");
       } catch (error) {
         localStorage.removeItem(latestDataStorageKey);
         return false;
@@ -1728,14 +1943,13 @@
 
     async function tryFetchLatest() {
       try {
-        const response = await fetch("https://raw.githubusercontent.com/pabank10-png/water-dashboard/main/data.json", { mode: "cors" });
-        if (response.ok) {
-          const data = await response.json();
-          if (applyLatestReservoirData(data, "ข้อมูลจริง")) {
-            localStorage.setItem(latestDataStorageKey, JSON.stringify(data));
-          } else {
-            loadCachedLatest();
-          }
+        const payloads = await Promise.all(reservoirApiSources.map(async source => {
+          const response = await fetch(source.url, { mode: "cors" });
+          if (!response.ok) throw new Error(`RID API ${source.label} failed`);
+          return { source, data: await response.json() };
+        }));
+        if (applyRidReservoirData(payloads, "ข้อมูลจริง")) {
+          localStorage.setItem(latestDataStorageKey, JSON.stringify(payloads));
         } else {
           loadCachedLatest();
         }
@@ -1748,10 +1962,14 @@
     }
 
     const reservoirCoordinates = {
+      BP: { latLng: [13.208179, 100.9750484], label: "เขื่อนบางพระ", radius: 3200 },
+      NK: { latLng: [13.1352778, 101.0386111], label: "อ่างเก็บน้ำหนองค้อ", radius: 2200 },
       DK: { latLng: [12.9003, 101.2042], label: "อ่างเก็บน้ำดอกกราย", radius: 2400 },
       NPL: { latLng: [12.9470, 101.2644], label: "อ่างเก็บน้ำหนองปลาไหล", radius: 3100 },
       KY: { latLng: [12.9765, 101.3081], label: "อ่างเก็บน้ำคลองใหญ่", radius: 2400 },
-      PS: { latLng: [12.9927, 101.5649], label: "อ่างเก็บน้ำประแสร์", radius: 4200 }
+      PS: { latLng: [12.9927, 101.5649], label: "อ่างเก็บน้ำประแสร์", radius: 4200 },
+      PK: { latLng: [13.092499, 101.822526], label: "อ่างเก็บน้ำคลองประแกด", radius: 2500 },
+      HM: { latLng: [13.0582195, 101.9728949], label: "อ่างเก็บน้ำคลองหางแมว", radius: 2800 }
     };
 
     function copyText(value) {
@@ -1823,6 +2041,7 @@
           iconAnchor: [0, 0]
         });
         const marker = L.marker(item.latLng, { icon, keyboard: true, title: item.label }).addTo(map);
+        reservoirMapLayers[code] = { halo, marker };
         marker.on("click", () => renderReservoir(code, { pin: true }));
         marker.on("mouseover", () => {
           if (!pinnedCode) renderReservoir(code);
@@ -1835,6 +2054,7 @@
           }
         });
       });
+      applyReservoirMarkerStatuses();
 
       function fitMobileReservoirMap() {
         if (!IS_IPHONE) return;
@@ -1845,12 +2065,12 @@
 
         const bounds = L.latLngBounds(Object.values(reservoirCoordinates).map(item => item.latLng));
         const mapSize = map.getSize();
-        const titleOffset = window.innerWidth > window.innerHeight ? 30 : 34;
-        const targetWidth = Math.max(180, rect.width - 64);
-        const targetHeight = Math.max(70, rect.height - titleOffset - 8);
-        let zoom = 13;
+        const titleOffset = window.innerWidth > window.innerHeight ? 28 : 34;
+        const targetWidth = Math.max(170, rect.width - 28);
+        const targetHeight = Math.max(86, rect.height - titleOffset - 14);
+        let zoom = 9;
 
-        for (let candidate = 13; candidate >= 7; candidate -= 1) {
+        for (let candidate = 12; candidate >= 6; candidate -= 1) {
           const nw = map.project(bounds.getNorthWest(), candidate);
           const se = map.project(bounds.getSouthEast(), candidate);
           const size = L.point(Math.abs(se.x - nw.x), Math.abs(se.y - nw.y));
