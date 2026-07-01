@@ -1636,10 +1636,15 @@
   <script>
     const landingVersion = "V2";
     const IS_IPHONE = /iPhone|iPod/.test(navigator.userAgent) || new URLSearchParams(location.search).has("iphonePreview");
+    const IS_IPAD = /iPad/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     document.documentElement.classList.toggle("is-iphone", IS_IPHONE);
     const LOCK_MAP = false;
     const DEFAULT_MAP_VIEW = {
       center: [12.9346, 101.377],
+      zoom: 10
+    };
+    const IPAD_MAP_VIEW = {
+      center: [12.752, 101.135],
       zoom: 10
     };
 
@@ -1711,6 +1716,7 @@
     };
 
     const latestDataStorageKey = "ry-water-latest-reservoir-data";
+    const ridLookbackDays = 7;
     let sourceLabel = "ข้อมูลตั้งต้น";
     let dataDate = "24 พ.ค. 2568";
     let pinnedCode = null;
@@ -1843,7 +1849,7 @@
         document.getElementById("detailCapacity").textContent = fmtDataValue(item.capacity);
         document.getElementById("detailCurrent").textContent = fmtDataValue(item.current);
         document.getElementById("detailPercent").textContent = Number.isFinite(status.percent) ? `${status.percent.toFixed(2)}% (${status.label})` : `รอข้อมูล (${status.label})`;
-        document.getElementById("detailDate").textContent = dataDate;
+        document.getElementById("detailDate").textContent = thaiGeneratedDate(item.dataDate) || dataDate;
         document.getElementById("sourceTag").textContent = sourceLabel === "ข้อมูลจริง" ? "(ข้อมูลจริง)" : sourceLabel === "ข้อมูล cache" ? "(ข้อมูลล่าสุดที่บันทึกไว้)" : "(ข้อมูลตั้งต้น)";
         document.getElementById("detailImage").style.backgroundImage = item.image;
         highlightReservoir(code);
@@ -1890,6 +1896,23 @@
       return `${day} ${months[month - 1]} ${year + 543}${timePart ? ` ${timePart} น.` : ""}`;
     }
 
+    function ridSourceUrl(source, date) {
+      return date ? `${source.url.replace(/\/$/, "")}/${date}` : source.url;
+    }
+
+    function ridDateString(offsetDays) {
+      const value = new Date();
+      value.setDate(value.getDate() - offsetDays);
+      const year = value.getFullYear();
+      const month = String(value.getMonth() + 1).padStart(2, "0");
+      const day = String(value.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function isValidRidRow(row) {
+      return row && Number(row.storage) > 0 && Number(row.volume) > 0;
+    }
+
     function collectRidReservoirRows(data) {
       const rows = [];
       const walk = value => {
@@ -1910,15 +1933,19 @@
     function applyRidReservoirData(payloads, label) {
       let updated = false;
       let latestDate = "";
+      const appliedCodes = new Set();
       payloads.forEach(({ data, source }) => {
         if (!data || !source) return;
-        if (data.date && data.date > latestDate) latestDate = data.date;
         const rows = collectRidReservoirRows(data);
         Object.entries(source.codes).forEach(([code, apiName]) => {
+          if (appliedCodes.has(code)) return;
           const row = rows.find(item => item.name === apiName);
-          if (!row || !reservoirs[code]) return;
+          if (!isValidRidRow(row) || !reservoirs[code]) return;
           reservoirs[code].capacity = Number(row.storage);
           reservoirs[code].current = Number(row.volume);
+          reservoirs[code].dataDate = data.date || "";
+          if (data.date && data.date > latestDate) latestDate = data.date;
+          appliedCodes.add(code);
           updated = true;
         });
       });
@@ -1943,11 +1970,16 @@
 
     async function tryFetchLatest() {
       try {
-        const payloads = await Promise.all(reservoirApiSources.map(async source => {
-          const response = await fetch(source.url, { mode: "cors" });
-          if (!response.ok) throw new Error(`RID API ${source.label} failed`);
-          return { source, data: await response.json() };
-        }));
+        const payloads = [];
+        for (let offset = 0; offset <= ridLookbackDays; offset += 1) {
+          const date = offset === 0 ? "" : ridDateString(offset);
+          const dailyPayloads = await Promise.all(reservoirApiSources.map(async source => {
+            const response = await fetch(ridSourceUrl(source, date), { mode: "cors" });
+            if (!response.ok) throw new Error(`RID API ${source.label} failed`);
+            return { source, data: await response.json() };
+          }));
+          payloads.push(...dailyPayloads);
+        }
         if (applyRidReservoirData(payloads, "ข้อมูลจริง")) {
           localStorage.setItem(latestDataStorageKey, JSON.stringify(payloads));
         } else {
@@ -1993,9 +2025,10 @@
         return;
       }
 
+      const initialMapView = IS_IPAD ? IPAD_MAP_VIEW : DEFAULT_MAP_VIEW;
       const map = L.map(mapElement, {
-        center: DEFAULT_MAP_VIEW.center,
-        zoom: DEFAULT_MAP_VIEW.zoom,
+        center: initialMapView.center,
+        zoom: initialMapView.zoom,
         zoomControl: !(LOCK_MAP || IS_IPHONE),
         attributionControl: true,
         preferCanvas: false
